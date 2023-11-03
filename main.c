@@ -11,30 +11,36 @@ char* lsh_read_line()
 
     if (!buffer)
     {
-        fprintf(stderr, "lsh: allocation error\n");
+	fprintf(stderr, "lsh: allocation error\n");
 	exit(EXIT_FAILURE);
     }
 
     int position = 0;
     while (true)
     {
-        char c = getchar();
+	char c = getchar();
 
 	if (c == EOF || c == '\n')
-        {
-  	    buffer[position] = '\n';
+	{
+	    buffer[position] = '\n';
 	    return buffer;
-        }
-	else
-        {
-  	    buffer[position] = c;
 	}
-	
+	else
+	{
+	    buffer[position] = c;
+	}
+
 	++position;
 
 	if (position >= buffer_size)
-        {
-	    // TODO: realocate buffer if needed
+	{
+	    buffer_size += buffer_size;
+	    buffer = realloc(buffer, buffer_size);
+	    if (!buffer)
+	    {
+		fprintf(stderr, "lsh: reallocation error\n");
+		exit(EXIT_FAILURE);
+	    }
 	}
     }
 }
@@ -46,9 +52,9 @@ void lsh_loop(void)
 
     do
     {
-        printf("> ");
+	printf("> ");
 	line = lsh_read_line();
-        printf("read: %s", line); // TODO: remove
+	printf("read: %s", line); // TODO: remove
 
 	free(line); // allocated inside lsh_read_line
     } while (status);
