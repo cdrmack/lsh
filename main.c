@@ -16,9 +16,11 @@ char* lsh_read_line()
     }
 
     int position = 0;
+    int c = 0;
+
     while (true)
     {
-	char c = getchar();
+        c = getchar(); // c has to be int, not char because EOF is an int
 
 	if (c == EOF || c == '\n')
 	{
