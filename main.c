@@ -2,49 +2,28 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-const int LSH_RL_BUFFERSIZE = 1024;
+const size_t LSH_RL_BUFFERSIZE = 1024;
 
 char* lsh_read_line()
 {
-    int buffer_size = LSH_RL_BUFFERSIZE;
-    char* buffer = malloc(sizeof(char) * buffer_size);
+    char* buffer = NULL;
+    size_t buffer_size = 0;
 
-    if (!buffer)
+    if (getline(&buffer, &buffer_size, stdin) == -1)
     {
-	fprintf(stderr, "lsh: allocation error\n");
-	exit(EXIT_FAILURE);
+      if (feof(stdin))
+      {
+	  exit(EXIT_SUCCESS);
+      }
+
+      if (ferror(stdin))
+      {
+	  fprintf(stderr, "lsh: getline error\n");
+	  exit(EXIT_FAILURE);
+      }
     }
 
-    int position = 0;
-    int c = 0;
-
-    while (true)
-    {
-        c = getchar(); // c has to be int, not char because EOF is an int
-
-	if (c == EOF || c == '\n')
-	{
-	    buffer[position] = '\n';
-	    return buffer;
-	}
-	else
-	{
-	    buffer[position] = c;
-	}
-
-	++position;
-
-	if (position >= buffer_size)
-	{
-	    buffer_size += buffer_size;
-	    buffer = realloc(buffer, buffer_size);
-	    if (!buffer)
-	    {
-		fprintf(stderr, "lsh: reallocation error\n");
-		exit(EXIT_FAILURE);
-	    }
-	}
-    }
+    return buffer;
 }
 
 void lsh_loop(void)
