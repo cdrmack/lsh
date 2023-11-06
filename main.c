@@ -11,16 +11,16 @@ char* lsh_read_line()
 
     if (getline(&buffer, &buffer_size, stdin) == -1)
     {
-      if (feof(stdin))
-      {
-	  exit(EXIT_SUCCESS);
-      }
+        if (feof(stdin))
+        {
+            exit(EXIT_SUCCESS);
+        }
 
-      if (ferror(stdin))
-      {
-	  fprintf(stderr, "lsh: getline error\n");
-	  exit(EXIT_FAILURE);
-      }
+        if (ferror(stdin))
+        {
+            fprintf(stderr, "lsh: getline error\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     return buffer;
