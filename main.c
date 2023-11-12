@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 const size_t LSH_RL_BUFFERSIZE = 1024;
 const size_t LSH_SL_BUFFERSIZE = 64;
@@ -68,6 +70,39 @@ char** lsh_split_line(char* line)
     return tokens;
 }
 
+int lsh_launch(char** args)
+{
+    int status = 0;
+    pid_t pid;
+
+    pid = fork();
+    if (pid < 0 )
+    {
+        // error
+        perror("lsh");
+    }
+    else if (pid == 0)
+    {
+        // child
+        if (execvp(args[0], args) == -1)
+        {
+            perror("lsh");
+        }
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        // parent
+        pid_t wpid;
+        do
+        {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
+
+    return 1;
+}
+
 void lsh_loop(void)
 {
     int status = 1;
@@ -79,6 +114,7 @@ void lsh_loop(void)
         printf("> ");
         line = lsh_read_line();
         arguments = lsh_split_line(line);
+        lsh_launch(arguments);
 
         free(line); // allocated inside lsh_read_line
         free(arguments); // allocated inside lsh_split_line
