@@ -44,14 +44,23 @@ int lsh_help(char** args)
 
 int lsh_cd(char** args)
 {
-    printf("Not implemented.\n");
-    return 0;
+    if (args[1] == NULL)
+    {
+        fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+        return 0;
+    }
+
+    if (chdir(args[1]) != 0)
+    {
+        perror("lsh");
+    }
+
+    return 1;
 }
 
 int lsh_exit(char** args)
 {
-    printf("Not implemented.\n");
-    return 0;
+    exit(EXIT_SUCCESS);
 }
 
 char* lsh_read_line(void)
