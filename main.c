@@ -9,6 +9,51 @@ const size_t LSH_RL_BUFFERSIZE = 1024;
 const size_t LSH_SL_BUFFERSIZE = 64;
 const char* LSH_SL_DELIM = " \t\r\n\a";
 
+// some commands needs to be builtin
+int lsh_cd(char** args);
+int lsh_exit(char** args);
+int lsh_help(char** args);
+
+char* builtin_str[] = {
+    "help",
+    "cd",
+    "exit",
+};
+
+// array of function pointers that return int and take char**
+int (*builtin_func[])(char**) = {
+    &lsh_help,
+    &lsh_cd,
+    &lsh_exit,
+};
+
+int lsh_num_builtins() {
+    return sizeof(builtin_str) / sizeof(char*);
+};
+
+int lsh_help(char** args)
+{
+    printf("The following functions are builtin:\n");
+    for (int i = 0; i < lsh_num_builtins(); ++i)
+    {
+        printf("  %s\n", builtin_str[i]);
+    }
+
+    return 1;
+};
+
+int lsh_cd(char** args)
+{
+    printf("Not implemented.\n");
+    return 0;
+}
+
+int lsh_exit(char** args)
+{
+    printf("Not implemented.\n");
+    return 0;
+}
+
 char* lsh_read_line(void)
 {
     char* buffer = NULL;
@@ -31,9 +76,8 @@ char* lsh_read_line(void)
     return buffer;
 }
 
-/*
- * No support for quoting or escaping.
- */
+
+// no support for quoting or escaping
 char** lsh_split_line(char* line)
 {
     size_t buffer_size = LSH_SL_BUFFERSIZE;
@@ -103,6 +147,25 @@ int lsh_launch(char** args)
     return 1;
 }
 
+int lsh_execute(char** args)
+{
+    if (args[0] == NULL)
+    {
+        // empty command
+        return 1;
+    }
+
+    for (int i = 0; i < lsh_num_builtins(); ++i)
+    {
+        if (strcmp(args[0], builtin_str[i]) == 0)
+        {
+            return (*builtin_func[i])(args);
+        }
+    }
+
+    return lsh_launch(args);
+}
+
 void lsh_loop(void)
 {
     int status = 1;
@@ -114,7 +177,7 @@ void lsh_loop(void)
         printf("> ");
         line = lsh_read_line();
         arguments = lsh_split_line(line);
-        lsh_launch(arguments);
+        lsh_execute(arguments);
 
         free(line); // allocated inside lsh_read_line
         free(arguments); // allocated inside lsh_split_line
