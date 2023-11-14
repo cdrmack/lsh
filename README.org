@@ -1,0 +1,5 @@
+Simplistic shell written in C. Based on the Stephen Brennan [[https://brennan.io/2015/01/16/write-a-shell-in-c/][article]].
+
+#+begin_src shell
+cc main.c
+#+end_src
