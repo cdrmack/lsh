@@ -27,9 +27,9 @@ int (*builtin_func[])(char**) = {
     &lsh_exit,
 };
 
-int lsh_num_builtins() {
+int lsh_num_builtins(void) {
     return sizeof(builtin_str) / sizeof(char*);
-};
+}
 
 int lsh_help(char** args)
 {
@@ -40,7 +40,7 @@ int lsh_help(char** args)
     }
 
     return 1;
-};
+}
 
 int lsh_cd(char** args)
 {
@@ -85,7 +85,6 @@ char* lsh_read_line(void)
     return buffer;
 }
 
-
 // no support for quoting or escaping
 char** lsh_split_line(char* line)
 {
@@ -98,7 +97,7 @@ char** lsh_split_line(char* line)
         exit(EXIT_FAILURE);
     }
 
-    int position = 0;
+    size_t position = 0;
     char* token = strtok(line, LSH_SL_DELIM);
     while (token)
     {
@@ -193,7 +192,7 @@ void lsh_loop(void)
     } while (status);
 }
 
-int main(int argc, char* argv[])
+int main(void)
 {
     printf("lsh\n");
     lsh_loop();
